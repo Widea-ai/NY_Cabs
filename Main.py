@@ -2,7 +2,7 @@ import sys
 import math
 from pyspark.sql.types import DoubleType
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf, mean, col
+from pyspark.sql.functions import udf, mean, col, date_format
 
 def haversine(lat1, lon1, lat2, lon2):
     """
@@ -37,12 +37,24 @@ if __name__ == '__main__':
 
     if sys.argv[1] == 'avg_speed':
         compute_speed_udf = udf(compute_speed, DoubleType())
-
         avg_speed = df.withColumn('avg_speed', compute_speed_udf('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'trip_duration'))\
             .select(mean(col("avg_speed")).alias('avg_speed'))\
             .collect()
-
         print(avg_speed[0]['avg_speed'])
+
+    elif sys.argv[1] == 'ride_by_day_of_week':
+        ride_by_day_of_week = df.withColumn('week_day', date_format(col("pickup_datetime"), "E"))\
+            .groupby('week_day')\
+            .count()\
+            .collect()
+
+        for day in ride_by_day_of_week:
+            print(day['week_day'], day['count'])
+
+    elif sys.argv[1] == 'ride_by_hour_of_day':
+
+    else:
+        print('Unkown command')
 
 # df.show()
 # df.printSchema()
