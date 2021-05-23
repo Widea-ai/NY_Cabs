@@ -45,7 +45,7 @@ class SparkComputation:
 
     def __init__(self):
         """
-        Initialize & clean Spark Dataframe that will be used for calculations
+        Initialize & clean Spark Dataframe that will be used for transformations
         """
         spark = SparkSession.builder.getOrCreate()
         self.df = spark.read.csv('train.csv', inferSchema=True, header=True)\

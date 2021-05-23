@@ -30,6 +30,12 @@ http://localhost:5000/ride_by_day_of_week
 ```
 
 ### Number of rides by hour of the day
+* 0 : 00:00 - 03:59
+* 1 : 04:00 - 07:59
+* 2 : 08:00 - 11:59
+* 3 : 12:00 - 15:29
+* 4 : 16:00 - 19:59
+* 5 : 20:00 - 23:59
 ```
 http://localhost:5000/ride_by_hour_of_day
 ```
