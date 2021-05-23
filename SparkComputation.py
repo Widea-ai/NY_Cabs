@@ -6,12 +6,13 @@ from pyspark.sql.functions import udf, mean, col, date_format
 
 def haversine(lat1, lon1, lat2, lon2):
     """
-    Calculate haversine distance
+    Calculate haversine distance between two geographical point
     :param lat1: Double
     :param lon1: Double
     :param lat2: Double
     :param lon2: Double
-    :return: distance
+    :return:
+    distance in meters
     """
     R = 6372800  # Earth radius in meters
 
@@ -30,39 +31,38 @@ def compute_speed(lat1, lon1, lat2, lon2, duration):
 
     return distance / duration
 
-if __name__ == '__main__':
-    spark = SparkSession.builder.getOrCreate()
-    df = spark.read.csv('train.csv', inferSchema=True, header=True)
 
-    if sys.argv[1] == 'avg_speed':
+class SparkComputation:
+
+    def __init__(self):
+        spark = SparkSession.builder.getOrCreate()
+        self.df = spark.read.csv('train.csv', inferSchema=True, header=True)
+
+    def get_avg_speed(self):
         compute_speed_udf = udf(compute_speed, DoubleType())
-        df.withColumn('avg_speed', compute_speed_udf('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'trip_duration'))\
-            .select(mean(col("avg_speed")).alias('avg_speed'))\
-            .show()
+        return self.df.withColumn('avg_speed',
+                      compute_speed_udf('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude',
+                                        'trip_duration')) \
+            .select(mean(col("avg_speed")).alias('avg_speed')) \
+            .collect()
 
-    elif sys.argv[1] == 'ride_by_day_of_week':
-        ride_by_day_of_week = df.withColumn('week_day', date_format(col("pickup_datetime"), "E"))\
+    def get_ride_by_day_of_week(self):
+        return self.df.withColumn('week_day', date_format(col("pickup_datetime"), "E"))\
             .groupby('week_day')\
             .count()\
-            .show()
+            .collect()
 
-    elif sys.argv[1] == 'ride_by_hour_of_day':
+    def get_ride_by_hour_of_day(self):
         hour_of_day = udf(lambda x: int(x/4), IntegerType())
-        df.withColumn('hour', hour_of_day(date_format(col("pickup_datetime"), "H").cast(IntegerType())))\
+        return self.df.withColumn('hour', hour_of_day(date_format(col("pickup_datetime"), "H").cast(IntegerType())))\
             .groupby('hour')\
             .count()\
-            .show()
+            .collect()
 
-    elif sys.argv[1] == 'km_by_day_of_week':
+    def get_km_by_day_of_week(self):
         compute_distance = udf(haversine, DoubleType())
-        df.withColumn('distance', compute_distance('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude'))\
+        return self.df.withColumn('distance', compute_distance('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude'))\
             .withColumn('week_day', date_format(col("pickup_datetime"), "E")) \
             .groupby('week_day')\
             .sum('distance')\
-            .show()
-
-    else:
-        print('Unkown command')
-
-# df.show()
-# df.printSchema()
+            .collect()
