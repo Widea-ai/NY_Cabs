@@ -19,7 +19,7 @@ flask run
 After running the project, you can access different parts of the test on a browser. 
 
 ### Average speed of each ride
-Instead of returning speed of 1.500.000 rides, i've made the average of all rides. 
+Instead of returning speed of 1.500.000 rides, i've made the average of all rides in km/h. 
 ```
 http://localhost:5000/avg_speed
 ```
