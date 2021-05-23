@@ -48,18 +48,19 @@ if __name__ == '__main__':
 
     elif sys.argv[1] == 'ride_by_hour_of_day':
         hour_of_day = udf(lambda x: int(x/4), IntegerType())
-        df.withColumn('hour', hour_of_day(date_format(col("pickup_datetime"), "k").cast(IntegerType())))\
+        df.withColumn('hour', hour_of_day(date_format(col("pickup_datetime"), "H").cast(IntegerType())))\
             .groupby('hour')\
             .count()\
             .show()
 
-    elif sys.argv[1] == 'km_by_hour_of_day':
+    elif sys.argv[1] == 'km_by_day_of_week':
         compute_distance = udf(haversine, DoubleType())
         df.withColumn('distance', compute_distance('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude'))\
             .withColumn('week_day', date_format(col("pickup_datetime"), "E")) \
             .groupby('week_day')\
             .sum('distance')\
             .show()
+
     else:
         print('Unkown command')
 
