@@ -60,8 +60,9 @@ class SparkComputation:
         compute_speed_udf = udf(compute_speed, DoubleType())
         return self.df.withColumn('avg_speed',
                       compute_speed_udf('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude',
-                                        'trip_duration')) \
-            .select(mean(col("avg_speed")).alias('avg_speed')) \
+                                        'trip_duration'))\
+            .filter((col('avg_speed') < 150) & (col('avg_speed') > 0))\
+            .select(mean(col('avg_speed')).alias('avg_speed'))\
             .collect()
 
     def get_ride_by_day_of_week(self):
@@ -92,6 +93,7 @@ class SparkComputation:
         """
         compute_distance = udf(haversine, DoubleType())
         return self.df.withColumn('distance', compute_distance('pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude'))\
+            .filter(col('distance') > 0)\
             .withColumn('week_day', date_format(col("pickup_datetime"), "E")) \
             .groupby('week_day')\
             .sum('distance')\

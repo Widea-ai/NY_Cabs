@@ -10,7 +10,7 @@ def avg_speed():
     result = sc.get_avg_speed()
 
     if len(result) < 1 or 'avg_speed' not in result[0]:
-        abort(500, 'No results, something wrong append')
+        abort(500, 'No results, something wrong appends')
     elif not isinstance(result[0]['avg_speed'], (float)):
         abort(500, 'Wrong response type')
 
@@ -21,7 +21,7 @@ def ride_by_day_of_week():
     rows = sc.get_ride_by_day_of_week()
 
     if len(rows) < 1:
-        abort(500, 'No results, something wrong append')
+        abort(500, 'No results, something wrong appends')
 
     result = {}
     for row in rows:
@@ -36,7 +36,7 @@ def ride_by_hour_of_day():
     rows = sc.get_ride_by_hour_of_day()
 
     if len(rows) < 1:
-        abort(500, 'No results, something wrong append')
+        abort(500, 'No results, something wrong appends')
 
     result = {}
     for row in rows:
@@ -51,7 +51,7 @@ def km_by_day_of_week():
     rows = sc.get_km_by_day_of_week()
 
     if len(rows) < 1:
-        abort(500, 'No results, something wrong append')
+        abort(500, 'No results, something wrong appends')
 
     result = {}
     for row in rows:
